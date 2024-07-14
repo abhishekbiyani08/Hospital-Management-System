@@ -2,222 +2,266 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <map>
 #include <random>
 #include <limits>
-#include <bits/stdc++.h>
+#include <map>
 
 using namespace std;
 
-// Define a structure for patient information
-struct Patient
+// Patient class to hold patient information
+class Patient
 {
+public:
     string name;
     int age;
     char gender;
     float bill;
+
+    // Constructor to initialize patient details
+    Patient(string n, int a, char g, float b) : name(n), age(a), gender(g), bill(b) {}
 };
 
-// Function to add a new patient to the system
-void addPatient(vector<Patient> &patients)
+// HospitalManagement class to manage all hospital-related operations
+class HospitalManagement
 {
-    Patient newPatient;
-    cout << "Enter patient's name: ";
-    getline(cin, newPatient.name); // To store the entire line as input (spaces too)
+private:
+    vector<Patient> patients;
+    map<string, int> patientIndexMap; // Map to store patient names and their indices
 
-    // Input age with error handling
-    while(true)
+    // Helper function to update the patient index map
+    void updatePatientIndexMap()
     {
-        cout << "Enter patient's age: ";
-        if(!(cin >> newPatient.age))
+        patientIndexMap.clear();
+        for (size_t i = 0; i < patients.size(); ++i)
         {
-            cout << "Invalid input! Please enter a valid age.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-        } 
-        else
-            break;
-    }
-
-    // Input gender with error handling
-    while(true)
-    {
-        cout << "Enter patient's gender (M/F/Other): ";
-        cin >> newPatient.gender;
-        if(newPatient.gender == 'M' || newPatient.gender == 'F' || newPatient.gender == 'Other')
-        {
-            break;
-        }
-        else
-        {
-            cout << "Invalid input! Please enter 'M' for Male, 'F' for Female, or 'O' for Other.\n";
+            patientIndexMap[patients[i].name] = i;
         }
     }
 
-    cout << "Enter patient's bill: INR ";
-    cin >> newPatient.bill;
-    
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clears remaining input in buffer
-    
-    // Add the new patient to the vector
-    patients.push_back(newPatient);
-    cout << "Patient added successfully!" << endl;
-}
-
-// Function to delete a patient from the system
-void deletePatient(vector<Patient> &patients)
-{
-    string name;
-    cout << "Enter the name of the patient to delete: ";
-    getline(cin, name);
-    
-    // Iterate through the vector to find the patient by name
-    for(auto it = patients.begin(); it != patients.end(); it++)
+public:
+    // Function to add a new patient
+    void addPatient()
     {
-        if(it->name == name)
+        string name;
+        int age;
+        char gender;
+        float bill;
+
+        cout << "Enter patient's name: ";
+        getline(cin, name);
+
+        // Age input with error handling
+        while (true)
         {
-            patients.erase(it); // Remove the patient
+            cout << "Enter patient's age: ";
+            if (!(cin >> age))
+            {
+                cout << "Invalid input! Please enter a valid age.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            else
+                break;
+        }
+
+        // Gender input with error handling
+        while (true)
+        {
+            cout << "Enter patient's gender (M/F/O): ";
+            cin >> gender;
+            if (gender == 'M' || gender == 'F' || gender == 'O')
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid input! Please enter 'M' for Male, 'F' for Female, or 'O' for Other.\n";
+            }
+        }
+
+        // Bill input with error handling
+        while (true)
+        {
+            cout << "Enter patient's bill: INR ";
+            if (!(cin >> bill) || bill < 0)
+            {
+                cout << "Invalid input! Please enter a positive bill amount.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            else
+                break;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear input buffer
+
+        patients.push_back(Patient(name, age, gender, bill));
+        updatePatientIndexMap(); // Update the map with the new patient
+        cout << "Patient added successfully!" << endl;
+    }
+
+    // Function to delete a patient
+    void deletePatient()
+    {
+        string name;
+        cout << "Enter the name of the patient to delete: ";
+        getline(cin, name);
+
+        auto it = patientIndexMap.find(name);
+        if (it != patientIndexMap.end())
+        {
+            int index = it->second;
+            patients.erase(patients.begin() + index);
+            updatePatientIndexMap(); // Update the map after deletion
             cout << "Patient deleted successfully!" << endl;
-            return;
+        }
+        else
+        {
+            cout << "Patient not found!" << endl;
         }
     }
-    cout << "Patient not found!" << endl;
-}
 
-// Function to call an ambulance
-void callAmbulance()
-{
-    static random_device rd;  // Ensures that it is initialized only once, even after multiple function calls
-    static mt19937 generator(rd()); // Declares a instance of the Mersenne Twister random number generator
-    uniform_int_distribution<long long int> distribution(6000000000LL, 9999999999LL);
-    long long int randomNumber = distribution(generator);
-    
-    cout << "Ambulance called! Please wait for assistance." << endl;
-    cout << "Contact the ambulance driver with the following number: " << randomNumber << endl;
-}
-
-// Function to display all patients in the system
-void displayPatients(const vector<Patient> &patients)
-{
-    cout << "\nPatients in the system:\n";
-    for (const auto &patient : patients)
+    // Function to call an ambulance
+    void callAmbulance()
     {
-        cout << "Name: " << patient.name << ", Age: " << patient.age << ", Gender: " << patient.gender << ", Bill: INR " << patient.bill << endl;
+        static random_device rd;
+        static mt19937 generator(rd());
+        uniform_int_distribution<long long int> distribution(6000000000LL, 9999999999LL);
+        long long int randomNumber = distribution(generator);
+
+        cout << "Ambulance called! Please wait for assistance." << endl;
+        cout << "Contact the ambulance driver with the following number: " << randomNumber << endl;
     }
-}
 
-// Function to find a patient by name
-void findPatientByName(const vector<Patient> &patients)
-{
-    string name;
-    cout << "Enter the name of the patient to search: ";
-    getline(cin, name);
-    
-    // Iterate through the vector to find the patient by name
-    for(const auto &patient : patients)
+    // Function to display all patients
+    void displayPatients() const
     {
-        if(patient.name == name)
+        cout << "\nPatients in the system:\n";
+        for (const auto &patient : patients)
         {
+            cout << "Name: " << patient.name << ", Age: " << patient.age << ", Gender: " << patient.gender << ", Bill: INR " << patient.bill << endl;
+        }
+    }
+
+    // Function to find a patient by name
+    void findPatientByName() const
+    {
+        string name;
+        cout << "Enter the name of the patient to search: ";
+        getline(cin, name);
+
+        auto it = patientIndexMap.find(name);
+        if (it != patientIndexMap.end())
+        {
+            const Patient &patient = patients[it->second];
             cout << "Patient found:\n";
             cout << "Name: " << patient.name << ", Age: " << patient.age << ", Gender: " << patient.gender << ", Bill: INR " << patient.bill << endl;
-            return;
+        }
+        else
+            cout << "Patient not found!" << endl;
+    }
+
+    // Function to display pending bills
+    void displayPendingBills() const
+    {
+        cout << "\nPending Bills:\n";
+        for (const auto &patient : patients)
+        {
+            if (patient.bill > 0)
+                cout << "Name: " << patient.name << ", Bill: INR " << patient.bill << endl;
         }
     }
-    cout << "Patient not found!" << endl;
-}
 
-// Function to display pending bills
-void displayPendingBills(const vector<Patient> &patients)
-{
-    cout << "\nPending Bills:\n";
-    for(const auto &patient : patients)
+    // Function to display settled bills
+    void displaySettledBills() const
     {
-        if(patient.bill > 0)
-            cout << "Name: " << patient.name << ", Bill: INR " << patient.bill << endl;
-    }
-}
-
-// Function to display settled bills
-void displaySettledBills(const vector<Patient> &patients)
-{
-    cout << "\nSettled Bills:\n";
-    for(const auto &patient : patients)
-    {
-        if(patient.bill == 0)
-            cout << "Name: " << patient.name << ", Bill: INR " << patient.bill << endl;
-    }
-}
-
-// Function to update patient's bill
-void updateBill(vector<Patient> &patients)
-{
-    string name;
-    float newBill;
-    cout << "Enter the name of the patient to update bill: ";
-    getline(cin, name);
-
-    cout << "Enter the new bill amount: INR ";
-    cin >> newBill;
-
-    // Clear input buffer
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    // Iterate through the vector to find the patient by name
-    for (auto &patient : patients)
-    {
-        if (patient.name == name)
+        cout << "\nSettled Bills:\n";
+        for (const auto &patient : patients)
         {
-            patient.bill = newBill;
+            if (patient.bill == 0)
+                cout << "Name: " << patient.name << ", Bill: INR " << patient.bill << endl;
+        }
+    }
+
+    // Function to update patient's bill
+    void updateBill()
+    {
+        string name;
+        float newBill;
+        cout << "Enter the name of the patient to update bill: ";
+        getline(cin, name);
+
+        // Bill input with error handling
+        while (true)
+        {
+            cout << "Enter the new bill amount: INR ";
+            if (!(cin >> newBill) || newBill < 0)
+            {
+                cout << "Invalid input! Please enter a positive bill amount.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+            else
+                break;
+        }
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        auto it = patientIndexMap.find(name);
+        if (it != patientIndexMap.end())
+        {
+            int index = it->second;
+            patients[index].bill = newBill;
             cout << "Bill updated successfully!" << endl;
-            return;
         }
+        else
+            cout << "Patient not found!" << endl;
     }
-    cout << "Patient not found!" << endl;
-}
 
-// Function to load patients' details from file
-void loadPatientsFromFile(vector<Patient> &patients)
-{
-    ifstream file("details.txt");
-    if(file.is_open())
+    // Function to load patients' details from file
+    void loadPatientsFromFile()
     {
-        Patient patient;
-        while(file >> patient.name >> patient.age >> patient.gender >> patient.bill)
+        ifstream file("details.txt");
+        if (file.is_open())
         {
-            patients.push_back(patient);
+            string name;
+            int age;
+            char gender;
+            float bill;
+            while (file >> name >> age >> gender >> bill)
+            {
+                patients.push_back(Patient(name, age, gender, bill));
+            }
+            file.close();
+            updatePatientIndexMap(); // Update the map after loading data
         }
-        file.close();
+        else
+            cout << "Unable to open file!" << endl;
     }
-    else
-    {
-        cout << "Unable to open file!" << endl;
-    }
-}
 
-// Function to save patients' details to file
-void savePatientsToFile(const vector<Patient> &patients)
-{
-    ofstream file("details.txt");
-    if(file.is_open())
+    // Function to save patients' details to file
+    void savePatientsToFile() const
     {
-        for(const auto &patient : patients)
+        ofstream file("details.txt");
+        if (file.is_open())
         {
-            file << patient.name << " " << patient.age << " " << patient.gender << " " << patient.bill << endl;
+            for (const auto &patient : patients)
+            {
+                file << patient.name << " " << patient.age << " " << patient.gender << " " << patient.bill << endl;
+            }
+            file.close();
+            cout << "Patients' details saved to file." << endl;
         }
-        file.close();
-        cout << "Patients' details saved to file." << endl;
+        else
+            cout << "Unable to open file!" << endl;
     }
-    else
-    {
-        cout << "Unable to open file!" << endl;
-    }
-}
+};
 
 int main()
 {
-    vector<Patient> patients;
-    loadPatientsFromFile(patients); // Load patients' details from file
-    
+    HospitalManagement hm;
+    hm.loadPatientsFromFile(); // Load patients' details from file
+
     int choice;
     do
     {
@@ -232,44 +276,50 @@ int main()
         cout << "8. Update Patient's Bill\n";
         cout << "9. Exit\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-        
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        
-        switch(choice)
+        if (!(cin >> choice))
         {
-            case 1:
-                addPatient(patients);
-                break;
-            case 2:
-                deletePatient(patients);
-                break;
-            case 3:
-                callAmbulance();
-                break;
-            case 4:
-                displayPatients(patients);
-                break;
-            case 5:
-                findPatientByName(patients);
-                break;
-            case 6:
-                displayPendingBills(patients);
-                break;
-            case 7:
-                displaySettledBills(patients);
-                break;
-            case 8:
-                updateBill(patients);
-                break;
-            case 9:
-                savePatientsToFile(patients); // Save patients' details to file before exit
-                cout << "Exiting... Thank you!\n" << endl << endl;
-                break;
-            default:
-                cout << "Invalid choice! Please try again.\n";
+            cout << "Invalid input! Please enter a valid choice.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
         }
-    }
-    while(choice != 9);
+
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice)
+        {
+        case 1:
+            hm.addPatient();
+            break;
+        case 2:
+            hm.deletePatient();
+            break;
+        case 3:
+            hm.callAmbulance();
+            break;
+        case 4:
+            hm.displayPatients();
+            break;
+        case 5:
+            hm.findPatientByName();
+            break;
+        case 6:
+            hm.displayPendingBills();
+            break;
+        case 7:
+            hm.displaySettledBills();
+            break;
+        case 8:
+            hm.updateBill();
+            break;
+        case 9:
+            hm.savePatientsToFile(); // Save patients' details to file before exit
+            cout << "Exiting... Thank you!\n";
+            break;
+        default:
+            cout << "Invalid choice! Please try again.\n";
+        }
+    } while (choice != 9);
+
     return 0;
 }
