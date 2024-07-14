@@ -1,10 +1,10 @@
-**Hospital Management System**
+
+## *Hospital Management System*
 
 Welcome to the Hospital Management System! This system is built using C++ and helps manage patient information efficiently. It provides functionalities to add, delete, display, and update patient details, call an ambulance, and manage bills.
 
-**Features**
-
-Add Patient: Add new patient details to the system.
+## **Features**
+***Add Patient***: Add new patient details to the system.
 
 Delete Patient: Remove a patient's details from the system.
 
@@ -23,21 +23,21 @@ Update Patient's Bill: Update the bill amount for a specific patient.
 Save and Load Patient Details: Save patients' details to a file and load them when the program starts.
 
 
-**Getting Started**
+## Getting Started
 
 Prerequisites
 
 Ensure you have a C++ compiler installed on your machine.
 
 
-**Compilation**
+## Compilation
 
 To compile the program, use the following command:
 
 g++ -o HospitalManagementSystem main.cpp
 
 
-**Running the Program**
+## Running the Program
 
 Run the executable:
 
@@ -66,10 +66,11 @@ loadPatientsFromFile: Loads patient details from a file.
 savePatientsToFile: Saves patient details to a file.
 
 
-**Contributing**
+## Contributing
 
 If you would like to contribute to this project, please fork the repository and submit a pull request.
 
 
-**License**
+## License
+
 This project is licensed under the MIT License - see the LICENSE file for details.
