@@ -85,7 +85,7 @@ public:
             cout << "Enter patient's bill: INR ";
             if (!(cin >> bill) || bill < 0)
             {
-                cout << "Invalid input! Please enter a positive bill amount.\n";
+                cout << "Invalid input! Please enter a valid positive bill amount.\n";
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
             }
@@ -133,7 +133,7 @@ public:
         cout << "Contact the ambulance driver with the following number: " << randomNumber << endl;
     }
 
-    // Function to display all patients
+    // Function to display all patients (read-only function due to const)
     void displayPatients() const
     {
         cout << "\nPatients in the system:\n";
@@ -143,7 +143,7 @@ public:
         }
     }
 
-    // Function to find a patient by name
+    // Function to find a patient by name (read-only function due to const)
     void findPatientByName() const
     {
         string name;
@@ -161,7 +161,7 @@ public:
             cout << "Patient not found!" << endl;
     }
 
-    // Function to display pending bills
+    // Function to display pending bills (read-only function due to const)
     void displayPendingBills() const
     {
         cout << "\nPending Bills:\n";
@@ -172,7 +172,7 @@ public:
         }
     }
 
-    // Function to display settled bills
+    // Function to display settled bills (read-only function due to const)
     void displaySettledBills() const
     {
         cout << "\nSettled Bills:\n";
@@ -239,7 +239,7 @@ public:
             cout << "Unable to open file!" << endl;
     }
 
-    // Function to save patients' details to file
+    // Function to save patients' details to file (read-only function due to const)
     void savePatientsToFile() const
     {
         ofstream file("details.txt");
